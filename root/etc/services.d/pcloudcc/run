@@ -1,0 +1,21 @@
+#!/usr/bin/with-contenv bash
+
+home="$(echo ~plex)"
+
+if  [ -e /pcloudpassSaved ]
+then
+
+  # subsequent run, pCloud password already saved
+  if ! pgrep -x "fusermount" > /dev/null
+  then
+    echo "pCloud not running, starting..."
+    exec s6-setuidgid plex /bin/sh -c 'pcloudcc -u $PCLOUDUSER -m /data/pcloud'
+  fi
+
+else
+  # first run, save pCloud password
+  echo "pCloud initial run, registering password.  You may remove the secret on the next run."
+  touch /pcloudpassSaved
+  exec s6-setuidgid plex /bin/sh -c 'pcloudcc -u $PCLOUDUSER -s -m /data/pcloud -p </run/secrets/pcloudpass'
+fi
+

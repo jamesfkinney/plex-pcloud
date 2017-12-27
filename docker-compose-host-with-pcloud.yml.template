@@ -1,0 +1,27 @@
+# Plex using host networking with pCloud Console Client
+# https://hub.docker.com/r/jamesfkinney/plex-pcloud/
+version: '3.1'
+services:
+  plex:
+    build: ./plex-pcloud
+    container_name: plex-pcloud
+    image: plex-pcloud
+    restart: unless-stopped
+    environment:
+      - TZ=<timezone>
+      - PLEX_CLAIM=<claimToken>
+      - PCLOUDUSER=<pCloud Username>
+    network_mode: host
+    privileged: true
+    cap_add:
+      - ALL
+    volumes:
+      - <path/to/plex/database>:/config
+      - <path/to/transcode/temp>:/transcode
+      - <path/to/media>:/data
+      - /lib/modules:/lib/modules
+    secrets:
+      - pcloudpass
+secrets:
+  pcloudpass:
+    file: <path/to/pcloud/password/file>
